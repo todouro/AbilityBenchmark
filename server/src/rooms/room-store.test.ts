@@ -86,6 +86,41 @@ test("a disconnected player can reconnect with their room token", () => {
   assert.equal(outcome.replacedSocketId, null);
 });
 
+test("async players can reconnect and submit later against the same seed", () => {
+  const store = new RoomStore({ disconnectGraceMs: 60_000 });
+  const host = store.createRoom({ nickname: "Host", mode: "async" }, "socket-host");
+  const guest = store.joinRoom(host.room.code, "Guest", "socket-guest");
+  const start = store.startRound(host.room.code, host.playerId);
+
+  assert.equal(start.round.phase, "playing");
+  store.disconnectSocket("socket-guest");
+
+  const hostSubmission = store.submitScore(
+    host.room.code,
+    host.playerId,
+    start.round.id,
+    { value: 165, unit: "ms" }
+  );
+  assert.equal(hostSubmission.completed, false);
+
+  const reconnected = store.reconnectPlayer(
+    host.room.code,
+    guest.playerId,
+    guest.reconnectToken,
+    "socket-guest-restored"
+  );
+  assert.equal(reconnected.session.room.currentRound?.seed, start.round.seed);
+
+  const guestSubmission = store.submitScore(
+    host.room.code,
+    guest.playerId,
+    start.round.id,
+    { value: 142, unit: "ms" }
+  );
+  assert.equal(guestSubmission.completed, true);
+  assert.equal(guestSubmission.results?.[0]?.playerId, guest.playerId);
+});
+
 test("the host role transfers when the host leaves", () => {
   const store = new RoomStore();
   const host = store.createRoom({ nickname: "Host" }, "socket-host");

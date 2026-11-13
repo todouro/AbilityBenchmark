@@ -615,12 +615,15 @@ export class RoomStore {
     const round = room.currentRound;
     if (!round || round.phase !== "playing") return null;
 
-    const hasPendingOnlinePlayer = round.eligiblePlayerIds.some((playerId) => {
+    const hasPendingPlayer = round.eligiblePlayerIds.some((playerId) => {
       if (round.submissions.has(playerId)) return false;
-      return room.players.get(playerId)?.socketId !== null;
+      const participant = room.players.get(playerId);
+      if (!participant) return false;
+      // Async players may return during the reconnect grace period and submit later.
+      return round.mode === "async" || participant.socketId !== null;
     });
 
-    if (hasPendingOnlinePlayer || round.submissions.size === 0) return null;
+    if (hasPendingPlayer || round.submissions.size === 0) return null;
 
     const lowerIsBetter =
       round.testId === "reaction-time" || round.testId === "aim-trainer";
