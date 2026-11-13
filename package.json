@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "npm run build --workspace @ability-benchmark/shared && npm run dev --workspace @ability-benchmark/server",
     "build": "npm run build --workspace @ability-benchmark/shared && npm run build --workspace @ability-benchmark/server",
-    "typecheck": "npm run typecheck --workspace @ability-benchmark/shared && npm run typecheck --workspace @ability-benchmark/server",
-    "test": "npm test --workspace @ability-benchmark/server",
+    "typecheck": "npm run build --workspace @ability-benchmark/shared && npm run typecheck --workspace @ability-benchmark/shared && npm run typecheck --workspace @ability-benchmark/server",
+    "test": "npm run build --workspace @ability-benchmark/shared && npm test --workspace @ability-benchmark/server",
     "start": "npm run start --workspace @ability-benchmark/server"
   },
   "engines": {
