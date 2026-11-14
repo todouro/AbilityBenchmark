@@ -179,7 +179,7 @@ function registerSocketHandlers(
         }
 
         emitResults(io, roomCode, outcome.completedResults);
-        return { left: true };
+        return { left: true as const };
       });
     });
 
@@ -243,7 +243,7 @@ function registerSocketHandlers(
             progress: player.progress
           });
         }
-        return { accepted: true };
+        return { accepted: true as const };
       });
     });
 
